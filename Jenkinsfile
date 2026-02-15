@@ -3,21 +3,21 @@ pipeline {
 
     environment {
         PROJECT_ID = 'spheric-subject-482019-e5'
-        REPO = 'my-docker-repo'                // GCP Artifact Registry repo
+        REPO = 'my-docker-repo'               // GCP Artifact Registry repo
         IMAGE_NAME = 'myflaskapp'
-        IMAGE_TAG = "${BUILD_NUMBER}"          // Versioning using Jenkins build number
-        GCP_CREDENTIALS = 'gcp-sa'             // Jenkins credential ID for GCP service account JSON
-        ZONE = 'us-central1-a'                 // GCP VM zone
-        VM_NAME = 'my-vm-name'                 // GCP VM name
+        IMAGE_TAG = "${BUILD_NUMBER}"         // Versioning using Jenkins build number
+        GCP_CREDENTIALS = 'gcp-sa'           // Jenkins credential ID for GCP service account JSON
+        ZONE = 'us-central1-a'               // Your GCP VM zone
+        VM_NAME = 'my-vm-name'               // Your GCP VM name
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                // Use GitHub credential for authentication
+                // Use correct repo URL + credentials
                 git branch: 'master', 
-                    url: 'https://github.com/shekhar8595/spheric-subject-482019-e5.git',
+                    url: 'https://github.com/shekhar8595/docker-repo.git',
                     credentialsId: 'jenkins-github'
             }
         }
