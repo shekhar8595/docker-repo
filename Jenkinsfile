@@ -15,7 +15,6 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                // Use correct repo URL + credentials
                 git branch: 'master', 
                     url: 'https://github.com/shekhar8595/docker-repo.git',
                     credentialsId: 'jenkins-github'
@@ -34,6 +33,17 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG ."
+            }
+        }
+
+        stage('Authenticate Docker with GCP') {
+            steps {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GCP_KEY')]) {
+                    sh """
+                        gcloud auth activate-service-account --key-file=$GCP_KEY
+                        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+                    """
+                }
             }
         }
 
