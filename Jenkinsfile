@@ -3,12 +3,12 @@ pipeline {
 
     environment {
         PROJECT_ID = 'spheric-subject-482019-e5'
-        REPO = 'my-docker-repo'               // GCP Artifact Registry repo
+        REPO = 'my-docker-repo'                 // GCP Artifact Registry repo
         IMAGE_NAME = 'myflaskapp'
-        IMAGE_TAG = "${BUILD_NUMBER}"         // Versioning using Jenkins build number
-        GCP_CREDENTIALS = 'gcp-sa'           // Jenkins credential ID for GCP service account JSON
-        VM_NAME = 'jenkins-devops-vm'
-        ZONE = 'europe-west1-b'              // Your GCP VM zone
+        IMAGE_TAG = "${BUILD_NUMBER}"           // Versioning using Jenkins build number
+        GCP_CREDENTIALS = 'gcp-sa'             // Jenkins credential ID for GCP service account JSON
+        ZONE = 'europe-west1-b'                // GCP VM zone
+        VM_NAME = 'jenkins-devops-vm'          // Your GCP VM name
     }
 
     stages {
@@ -39,10 +39,10 @@ pipeline {
         stage('Authenticate Docker with GCP') {
             steps {
                 withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GCP_KEY')]) {
-                    sh """
+                    sh '''
                         gcloud auth activate-service-account --key-file=$GCP_KEY
                         gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-                    """
+                    '''
                 }
             }
         }
@@ -57,10 +57,10 @@ pipeline {
             steps {
                 sh """
                 gcloud compute ssh $VM_NAME --zone=$ZONE --command="
-                    docker stop $IMAGE_NAME || true
-                    docker rm $IMAGE_NAME || true
-                    docker pull us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
-                    docker run -d -p 5000:5000 --name $IMAGE_NAME us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
+                    sudo docker stop $IMAGE_NAME || true
+                    sudo docker rm $IMAGE_NAME || true
+                    sudo docker pull us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
+                    sudo docker run -d -p 5000:5000 --name $IMAGE_NAME us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
                 "
                 """
             }
