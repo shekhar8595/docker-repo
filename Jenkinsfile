@@ -7,8 +7,8 @@ pipeline {
         IMAGE_NAME = 'myflaskapp'
         IMAGE_TAG = "${BUILD_NUMBER}"         // Versioning using Jenkins build number
         GCP_CREDENTIALS = 'gcp-sa'           // Jenkins credential ID for GCP service account JSON
-        ZONE = 'us-central1-a'               // Your GCP VM zone
-        VM_NAME = 'my-vm-name'               // Your GCP VM name
+        VM_NAME = 'jenkins-devops-vm'
+        ZONE = 'europe-west1-b'              // Your GCP VM zone
     }
 
     stages {
