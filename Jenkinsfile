@@ -3,19 +3,22 @@ pipeline {
 
     environment {
         PROJECT_ID = 'spheric-subject-482019-e5'
-        REPO = 'my-docker-repo'               // Change to your Artifact Registry repo
+        REPO = 'my-docker-repo'                // GCP Artifact Registry repo
         IMAGE_NAME = 'myflaskapp'
         IMAGE_TAG = "${BUILD_NUMBER}"          // Versioning using Jenkins build number
-        GCP_CREDENTIALS = 'gcp-sa' // Jenkins credential ID for service account JSON
-        ZONE = 'us-central1-a'                // Your VM zone
-        VM_NAME = 'my-vm-name'                // Your GCP VM name
+        GCP_CREDENTIALS = 'gcp-sa'             // Jenkins credential ID for GCP service account JSON
+        ZONE = 'us-central1-a'                 // GCP VM zone
+        VM_NAME = 'my-vm-name'                 // GCP VM name
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/shekhar8595/spheric-subject-482019-e5.git'
+                // Use GitHub credential for authentication
+                git branch: 'master', 
+                    url: 'https://github.com/shekhar8595/spheric-subject-482019-e5.git',
+                    credentialsId: 'jenkins-github'
             }
         }
 
@@ -44,10 +47,10 @@ pipeline {
             steps {
                 sh """
                 gcloud compute ssh $VM_NAME --zone=$ZONE --command="
-                docker stop $IMAGE_NAME || true
-                docker rm $IMAGE_NAME || true
-                docker pull us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
-                docker run -d -p 5000:5000 --name $IMAGE_NAME us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
+                    docker stop $IMAGE_NAME || true
+                    docker rm $IMAGE_NAME || true
+                    docker pull us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
+                    docker run -d -p 5000:5000 --name $IMAGE_NAME us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE_NAME:$IMAGE_TAG
                 "
                 """
             }
